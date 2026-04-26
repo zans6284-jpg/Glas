@@ -3,56 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>life for ...</title>
+    <title>Professional Glassmorphism System</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="bg-container"></div>
-    <div id="bg-overlay"></div>
+    <div id="bg-container">
+        <img id="bg-photo" src="images/moun.jpg" class="active">
+        <video id="bg-video" loop muted></video>
+    </div>
+    <div class="overlay"></div>
 
     <div id="settings-trigger" onclick="toggleSettings()"><i class="fas fa-cog"></i></div>
-
-    <div id="settings-panel" class="glass-panel">
-        <span class="close-btn" onclick="toggleSettings()">&times;</span>
-        <h3>Settings</h3>
-        <label for="wall-upload" class="upload-label">Change Wallpaper (Pic/Video)</label>
-        <input type="file" id="wall-upload" accept="image/*,video/*" hidden>
-        <div class="settings-actions">
-            <button onclick="saveWallpaper()" class="neon-btn">Save</button>
-            <button onclick="resetWallpaper()" class="neon-btn reset">Reset</button>
+    <div id="settings-panel">
+        <div class="settings-header">
+            <h3>Settings</h3>
+            <i class="fas fa-times" onclick="toggleSettings()"></i>
+        </div>
+        <div class="settings-body">
+            <label>Change Wallpaper (Photo/Video)</label>
+            <input type="file" id="wall-input" accept="image/*,video/*">
+            <div class="btn-group">
+                <button onclick="saveWallpaper()" class="neon-btn">Save</button>
+                <button onclick="resetWallpaper()" class="neon-btn">Reset</button>
+            </div>
         </div>
     </div>
 
-    <div id="auth-container" class="login-box">
-        <h2 id="auth-title">LOGIN</h2>
-        <form id="authForm">
-            <div class="input-group">
-                <i class="fas fa-user"></i>
-                <input type="text" id="username" required>
-                <label>Username</label>
-            </div>
-            <div class="input-group">
-                <i class="fas fa-lock"></i>
-                <input type="password" id="password" required>
-                <label>Password</label>
-            </div>
-            <button type="submit" id="authBtn" class="neon-btn">Sign In</button>
-            <p class="signup-link" id="toggle-text">
-                New here? <a href="#" onclick="switchAuth(event, 'reg')">Create Account</a>
-            </p>
-        </form>
+    <div class="container" id="auth-page">
+        <div class="login-box">
+            <h2 id="auth-title">LOGIN</h2>
+            <form id="authForm">
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" required>
+                    <label>Username</label>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" required>
+                    <label>Password</label>
+                </div>
+                <button type="submit" class="login-btn" id="submitBtn">Sign In</button>
+                <p class="signup-link" id="auth-toggle-text">
+                    New here? <a href="#" onclick="toggleAuthMode()">Create Account</a>
+                </p>
+            </form>
+        </div>
     </div>
 
-    <div id="main-dashboard" class="glass-panel" style="display: none;">
-        <h2>Search Bot</h2>
-        <div id="chat-box">
-            <div class="bot-msg">Welcome. System ready for search.</div>
-        </div>
-        <div class="chat-input-area">
-            <input type="text" id="user-query" placeholder="Search video, photo, or anything...">
-            <button id="send-btn" onclick="handleSearch()"><i class="fas fa-paper-plane"></i></button>
+    <div class="main-interface" id="main-page" style="display: none;">
+        <div class="chat-container">
+            <div id="chat-display" class="chat-display"></div>
+            <div class="input-area">
+                <input type="text" id="chatInput" placeholder="Search Google, TikTok, YouTube...">
+                <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+            </div>
         </div>
     </div>
 

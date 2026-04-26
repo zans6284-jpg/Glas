@@ -1,79 +1,57 @@
-* {
-    margin: 0; padding: 0; box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+body { 
+    display: flex; justify-content: center; align-items: center; 
+    min-height: 100vh; overflow: hidden; position: relative; background: #000;
 }
 
-body {
-    display: flex; justify-content: center; align-items: center;
-    min-height: 100vh; overflow: hidden; background: #0f172a;
+/* Background System */
+#bg-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; }
+#bg-photo, #bg-video { width: 100%; height: 100%; object-fit: cover; display: none; }
+#bg-photo.active, #bg-video.active { display: block; }
+.overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: -1; }
+
+/* Settings Panel */
+#settings-trigger { position: fixed; top: 20px; left: 20px; color: #00ffff; font-size: 24px; cursor: pointer; z-index: 100; text-shadow: 0 0 10px #00ffff; }
+#settings-panel { 
+    position: fixed; top: 0; left: -300px; width: 280px; height: 100%; 
+    background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); 
+    transition: 0.4s; z-index: 101; padding: 20px; border-right: 1px solid rgba(0,255,255,0.3);
+}
+#settings-panel.open { left: 0; }
+.neon-btn { 
+    background: transparent; border: 1px solid #00ffff; color: #00ffff; 
+    padding: 8px 15px; cursor: pointer; text-shadow: 0 0 5px #00ffff; 
+    box-shadow: inset 0 0 5px #00ffff; margin-top: 10px;
 }
 
-/* Background Management */
-#bg-container {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    z-index: -2; object-fit: cover;
-}
-#bg-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(15, 23, 42, 0.4); z-index: -1;
-}
-
-/* Settings Icon */
-#settings-trigger {
-    position: absolute; top: 20px; left: 20px;
-    color: #0ea5e9; font-size: 24px; cursor: pointer; transition: 0.3s;
-}
-
-.glass-panel {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 16px; padding: 40px;
-}
-
-/* Neon Button Style */
-.neon-btn {
-    width: 100%; padding: 12px;
-    background: transparent;
-    border: 1px solid #00ffff;
-    color: #00ffff;
-    text-transform: uppercase; letter-spacing: 2px;
-    font-weight: 600; cursor: pointer;
-    text-shadow: 0 0 10px #00ffff;
-    transition: 0.3s; margin-top: 15px;
-}
-.neon-btn:hover {
-    background: rgba(0, 255, 255, 0.1);
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
-}
-
-/* Login Box (Disesuaikan dari gambar) */
+/* Glassmorphism Box */
 .login-box {
-    width: 380px; padding: 40px;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(12px); border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 380px; padding: 50px 40px; background: rgba(255,255,255,0.05);
+    border-radius: 16px; backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.2); text-align: center;
 }
+h2 { color: #00ffff; text-shadow: 0 0 15px #00ffff; margin-bottom: 30px; }
 
-.input-group { position: relative; margin-bottom: 30px; }
-.input-group input {
-    width: 100%; background: transparent; border: none;
-    border-bottom: 1.5px solid rgba(255,255,255,0.4);
-    padding: 10px 5px 10px 30px; color: white; outline: none;
+/* Input Groups */
+.input-group { position: relative; margin-bottom: 35px; border-bottom: 1.5px solid rgba(255,255,255,0.4); }
+.input-group i { position: absolute; left: 0; top: 12px; color: rgba(255,255,255,0.6); }
+.input-group input { width: 100%; padding: 12px 30px; background: transparent; border: none; color: #fff; outline: none; }
+.input-group label { position: absolute; left: 30px; top: 12px; color: rgba(255,255,255,0.8); pointer-events: none; transition: 0.3s; }
+.input-group input:focus~label, .input-group input:valid~label { top: -18px; left: 0; font-size: 12px; color: #00ffff; }
+
+/* Buttons */
+.login-btn { 
+    width: 100%; padding: 14px; background: transparent; border: 1px solid #00ffff;
+    color: #00ffff; border-radius: 8px; font-weight: 600; cursor: pointer;
+    text-transform: uppercase; letter-spacing: 2px; transition: 0.3s;
+    text-shadow: 0 0 10px #00ffff; box-shadow: 0 0 10px rgba(0,255,255,0.2);
 }
-.input-group i { position: absolute; left: 0; top: 10px; color: #0ea5e9; }
+.login-btn:hover { background: #00ffff; color: #000; box-shadow: 0 0 20px #00ffff; }
 
-/* Dashboard & Chat */
-#main-dashboard { width: 80%; max-width: 800px; height: 80vh; display: flex; flex-direction: column; }
-#chat-box { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-.bot-msg { background: rgba(14, 165, 233, 0.2); padding: 10px; border-radius: 8px; color: white; align-self: flex-start; }
-.user-msg { background: rgba(0, 255, 255, 0.1); padding: 10px; border-radius: 8px; color: #00ffff; align-self: flex-end; }
-.chat-input-area { display: flex; gap: 10px; margin-top: 20px; }
-.chat-input-area input { flex: 1; background: transparent; border: 1px solid #0ea5e9; color: white; padding: 10px; border-radius: 5px; }
-
-/* Settings Modal */
-#settings-panel {
-    position: absolute; top: 70px; left: 20px; width: 250px;
-    display: none; z-index: 100;
-}
-.close-btn { float: right; cursor: pointer; color: white; }
+/* Chat Interface */
+.chat-container { width: 90vw; max-width: 800px; height: 80vh; display: flex; flex-direction: column; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-radius: 20px; border: 1px solid #00ffff; }
+.chat-display { flex: 1; padding: 20px; overflow-y: auto; color: #fff; }
+.input-area { display: flex; padding: 20px; border-top: 1px solid rgba(0,255,255,0.3); }
+.input-area input { flex: 1; background: transparent; border: 1px solid #00ffff; padding: 12px; color: #fff; border-radius: 5px; outline: none; }
+.input-area button { background: transparent; color: #00ffff; border: none; font-size: 24px; margin-left: 15px; cursor: pointer; text-shadow: 0 0 10px #00ffff; }
