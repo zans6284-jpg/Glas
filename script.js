@@ -1,103 +1,132 @@
-let isRegisterMode = false;
+document.addEventListener('DOMContentLoaded', () => {
+    // DOM Elements
+    const bgContainer = document.getElementById('bg-container');
+    const settingsMenu = document.getElementById('settings-menu');
+    const settingsToggle = document.getElementById('settings-toggle');
+    const closeMenu = document.querySelector('.close-menu');
+    const wallpaperInput = document.getElementById('wallpaper-input');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const authContainer = document.getElementById('auth-container');
+    const mainInterface = document.getElementById('main-interface');
+    const chatBox = document.getElementById('chat-box');
+    const hideChatBtn = document.getElementById('hide-chat');
 
-// --- WALLPAPER SYSTEM ---
-const wallInput = document.getElementById('wall-input');
-const bgPhoto = document.getElementById('bg-photo');
-const bgVideo = document.getElementById('bg-video');
-
-wallInput.addEventListener('change', function() {
-    const file = this.files[0];
-    if (file) {
-        const url = URL.createObjectURL(file);
-        applyWallpaper(url, file.type);
-    }
-});
-
-function applyWallpaper(url, type) {
-    if (type.includes('video')) {
-        bgPhoto.classList.remove('active');
-        bgVideo.src = url;
-        bgVideo.classList.add('active');
-        bgVideo.muted = false; // Suara aktif
-        bgVideo.play();
-    } else {
-        bgVideo.classList.remove('active');
-        bgPhoto.src = url;
-        bgPhoto.classList.add('active');
-    }
-}
-
-function saveWallpaper() {
-    const currentSrc = bgVideo.classList.contains('active') ? bgVideo.src : bgPhoto.src;
-    localStorage.setItem('savedWallpaper', currentSrc);
-    localStorage.setItem('isVid', bgVideo.classList.contains('active'));
-    alert("Wallpaper Saved!");
-}
-
-function resetWallpaper() {
-    localStorage.removeItem('savedWallpaper');
-    location.reload();
-}
-
-// Load wallpaper on refresh
-window.onload = () => {
-    const saved = localStorage.getItem('savedWallpaper');
-    const isVid = localStorage.getItem('isVid') === 'true';
-    if (saved) applyWallpaper(saved, isVid ? 'video' : 'image');
-};
-
-// --- AUTH SYSTEM ---
-function toggleAuthMode() {
-    isRegisterMode = !isRegisterMode;
-    document.getElementById('auth-title').innerText = isRegisterMode ? "REGISTER" : "LOGIN";
-    document.getElementById('submitBtn').innerText = isRegisterMode ? "Sign Up" : "Sign In";
-    document.getElementById('auth-toggle-text').innerHTML = isRegisterMode ? 
-        `Already have an account? <a href="#" onclick="toggleAuthMode()">Login</a>` : 
-        `New here? <a href="#" onclick="toggleAuthMode()">Create Account</a>`;
-}
-
-document.getElementById('authForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const user = document.getElementById('username').value;
-    const pass = document.getElementById('password').value;
-
-    if (isRegisterMode) {
-        localStorage.setItem(`user_${user}`, pass);
-        alert("Registration Success! Please Login.");
-        toggleAuthMode();
-    } else {
-        const savedPass = localStorage.getItem(`user_${user}`);
-        if (savedPass === pass) {
-            document.getElementById('auth-page').style.display = 'none';
-            document.getElementById('main-page').style.display = 'flex';
+    // 1. Wallpaper System
+    const loadWallpaper = () => {
+        const savedBg = localStorage.getItem('customBg');
+        const type = localStorage.getItem('bgType');
+        if (savedBg) {
+            renderBackground(savedBg, type);
         } else {
-            alert("Invalid Credentials!");
+            bgContainer.innerHTML = `<img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1920&q=80">`;
         }
-    }
-});
+    };
 
-// --- SETTINGS UI ---
-function toggleSettings() {
-    document.getElementById('settings-panel').classList.toggle('open');
-}
+    const renderBackground = (src, type) => {
+        if (type.includes('video')) {
+            bgContainer.innerHTML = `<video autoplay muted loop playsinline src="${src}"></video>`;
+        } else {
+            bgContainer.innerHTML = `<img src="${src}">`;
+        }
+    };
 
-// --- BOT CHAT SEARCH SYSTEM ---
-document.getElementById('sendBtn').onclick = () => {
-    const query = document.getElementById('chatInput').value;
-    if (!query) return;
+    wallpaperInput.onchange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = () => {
+            const result = reader.result;
+            const type = file.type;
+            renderBackground(result, type);
+            // Save to LocalStorage
+            document.getElementById('save-bg').onclick = () => {
+                localStorage.setItem('customBg', result);
+                localStorage.setItem('bgType', type);
+                alert("Wallpaper Saved!");
+            };
+        };
+        reader.readAsDataURL(file);
+    };
 
-    const display = document.getElementById('chat-display');
-    display.innerHTML += `<div><b>You:</b> ${query}</div>`;
-    
-    // Bot Logic
-    setTimeout(() => {
-        let response = `Searching for "${query}"...<br>`;
-        response += `<a href="https://www.google.com/search?q=${query}" target="_blank" style="color:cyan">Search on Google</a> | `;
-        response += `<a href="https://www.youtube.com/results?search_query=${query}" target="_blank" style="color:cyan">YouTube</a> | `;
-        response += `<a href="https://www.tiktok.com/search?q=${query}" target="_blank" style="color:cyan">TikTok</a>`;
+    document.getElementById('reset-bg').onclick = () => {
+        localStorage.removeItem('customBg');
+        localStorage.removeItem('bgType');
+        location.reload();
+    };
+
+    // 2. Auth System (Local Storage)
+    document.getElementById('go-to-register').onclick = () => {
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'block';
+    };
+
+    document.getElementById('go-to-login').onclick = () => {
+        registerForm.style.display = 'none';
+        loginForm.style.display = 'block';
+    };
+
+    registerForm.onsubmit = (e) => {
+        e.preventDefault();
+        const u = document.getElementById('reg-user').value;
+        const p = document.getElementById('reg-pass').value;
+        localStorage.setItem(`user_${u}`, p);
+        alert("Account Created! Please Login.");
+        registerForm.style.display = 'none';
+        loginForm.style.display = 'block';
+    };
+
+    loginForm.onsubmit = (e) => {
+        e.preventDefault();
+        const u = document.getElementById('login-user').value;
+        const p = document.getElementById('login-pass').value;
+        const savedPass = localStorage.getItem(`user_${u}`);
+
+        if (savedPass && savedPass === p) {
+            alert(`Welcome back, ${u}!`);
+            authContainer.style.display = 'none';
+            mainInterface.style.display = 'flex';
+        } else {
+            alert("Invalid Username or Password!");
+        }
+    };
+
+    // 3. AI Search Simulation
+    document.getElementById('send-btn').onclick = () => {
+        const query = document.getElementById('search-input').value;
+        if (!query) return;
+
+        chatBox.innerHTML += `<div class="user-msg" style="text-align:right; margin:10px; color:#00f2ff;">You: ${query}</div>`;
         
-        display.innerHTML += `<div style="margin-top:10px"><b>System Bot:</b><br>${response}</div><hr>`;
-        document.getElementById('chatInput').value = "";
-        display.scrollTop = display.scrollHeight;
-    }, 1000);
-};
+        setTimeout(() => {
+            const googleLink = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            const youtubeLink = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+            
+            chatBox.innerHTML += `
+                <div class="bot-msg" style="background:rgba(255,255,255,0.1); padding:10px; border-radius:10px; margin:10px;">
+                    Searching for "${query}"... <br>
+                    🔗 <a href="${googleLink}" target="_blank" style="color:cyan">View on Google</a><br>
+                    🎬 <a href="${youtubeLink}" target="_blank" style="color:red">View on YouTube</a>
+                </div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }, 1000);
+        document.getElementById('search-input').value = "";
+    };
+
+    // 4. UI Toggles
+    settingsToggle.onclick = () => settingsMenu.classList.add('active');
+    closeMenu.onclick = () => settingsMenu.classList.remove('active');
+
+    hideChatBtn.onclick = () => {
+        if (chatBox.style.visibility === 'hidden') {
+            chatBox.style.visibility = 'visible';
+            document.querySelector('.input-area').style.visibility = 'visible';
+            hideChatBtn.className = 'fas fa-eye';
+        } else {
+            chatBox.style.visibility = 'hidden';
+            document.querySelector('.input-area').style.visibility = 'hidden';
+            hideChatBtn.className = 'fas fa-eye-slash';
+        }
+    };
+
+    loadWallpaper();
+});
