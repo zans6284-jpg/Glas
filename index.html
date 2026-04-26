@@ -3,76 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Glassmorphism System</title>
+    <title>Advanced System Hub</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="bg-container"></div>
-    <div class="overlay"></div>
 
-    <div id="settings-toggle" class="settings-icon"><i class="fas fa-cog"></i></div>
+    <div class="menu-btn" onclick="toggleSettings()">
+        <i class="fas fa-bars"></i>
+    </div>
 
-    <div id="settings-menu" class="side-menu">
-        <div class="menu-header">
+    <div id="settings-sidebar" class="sidebar">
+        <div class="sidebar-header">
             <h3>Settings</h3>
-            <i class="fas fa-times close-menu"></i>
+            <i class="fas fa-times" onclick="toggleSettings()"></i>
         </div>
-        <div class="menu-body">
-            <label>Wallpaper (Photo/Video)</label>
-            <input type="file" id="wallpaper-input" accept="image/*,video/*">
-            <div class="button-group">
-                <button id="save-bg" class="neon-btn">Save</button>
-                <button id="reset-bg" class="neon-btn">Reset</button>
-            </div>
+        <div class="setting-item">
+            <label>Upload Wallpaper (Img/Vid)</label>
+            <input type="file" id="bg-upload" accept="image/*,video/*">
+        </div>
+        <button class="neon-btn" onclick="saveWallpaper()">SAVE</button>
+        <button class="neon-btn reset" onclick="resetWallpaper()">RESET</button>
+    </div>
+
+    <div id="auth-section" class="container">
+        <div class="login-box">
+            <form id="authForm">
+                <h2 id="form-title">LOGIN</h2>
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" required>
+                    <label>Username</label>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" required>
+                    <label>Password</label>
+                </div>
+                <button type="submit" id="submitBtn" class="neon-btn">SIGN IN</button>
+                <p class="signup-link" id="toggle-text">
+                    New here? <a href="javascript:void(0)" onclick="switchForm('register')">Create Account</a>
+                </p>
+            </form>
         </div>
     </div>
 
-    <div id="auth-container" class="glass-box">
-        <form id="login-form">
-            <h2>LOGIN</h2>
-            <div class="input-group">
-                <i class="fas fa-user"></i>
-                <input type="text" id="login-user" required placeholder=" ">
-                <label>Username</label>
+    <div id="main-app" class="container" style="display: none;">
+        <div class="chat-app login-box">
+            <div class="chat-sidebar">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search user...">
+                    <button class="neon-btn-sm"><i class="fas fa-plus"></i></button>
+                </div>
+                <div class="user-list">
+                    <div class="user-item"><span>User 1</span></div>
+                    <div class="user-item"><span>User 2</span></div>
+                </div>
             </div>
-            <div class="input-group">
-                <i class="fas fa-lock"></i>
-                <input type="password" id="login-pass" required placeholder=" ">
-                <label>Password</label>
+            <div class="chat-window">
+                <div class="chat-header">Live Chat</div>
+                <div class="messages" id="msg-box"></div>
+                <div class="chat-input">
+                    <input type="text" placeholder="Type a message...">
+                    <button class="neon-btn-sm">Send</button>
+                </div>
             </div>
-            <button type="submit" class="auth-btn">Sign In</button>
-            <p class="toggle-text">New here? <span id="go-to-register">Create Account</span></p>
-        </form>
-
-        <form id="register-form" style="display: none;">
-            <h2>REGISTER</h2>
-            <div class="input-group">
-                <i class="fas fa-user"></i>
-                <input type="text" id="reg-user" required placeholder=" ">
-                <label>Username</label>
-            </div>
-            <div class="input-group">
-                <i class="fas fa-lock"></i>
-                <input type="password" id="reg-pass" required placeholder=" ">
-                <label>Password</label>
-            </div>
-            <button type="submit" class="auth-btn">Register</button>
-            <p class="toggle-text">Have an account? <span id="go-to-login">Login</span></p>
-        </form>
-    </div>
-
-    <div id="main-interface" class="interface-container" style="display: none;">
-        <div class="chat-header">
-            <i id="hide-chat" class="fas fa-eye"></i>
-        </div>
-        <div id="chat-box" class="chat-display">
-            <div class="bot-msg">Welcome! I am your AI Search bot. How can I help?</div>
-        </div>
-        <div class="input-area">
-            <input type="text" id="search-input" placeholder="Search anything (YouTube, TikTok, Google)...">
-            <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 

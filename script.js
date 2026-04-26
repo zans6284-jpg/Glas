@@ -1,132 +1,97 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // DOM Elements
-    const bgContainer = document.getElementById('bg-container');
-    const settingsMenu = document.getElementById('settings-menu');
-    const settingsToggle = document.getElementById('settings-toggle');
-    const closeMenu = document.querySelector('.close-menu');
-    const wallpaperInput = document.getElementById('wallpaper-input');
-    const loginForm = document.getElementById('login-form');
-    const registerForm = document.getElementById('register-form');
-    const authContainer = document.getElementById('auth-container');
-    const mainInterface = document.getElementById('main-interface');
-    const chatBox = document.getElementById('chat-box');
-    const hideChatBtn = document.getElementById('hide-chat');
+let isRegister = false;
 
-    // 1. Wallpaper System
-    const loadWallpaper = () => {
-        const savedBg = localStorage.getItem('customBg');
-        const type = localStorage.getItem('bgType');
-        if (savedBg) {
-            renderBackground(savedBg, type);
-        } else {
-            bgContainer.innerHTML = `<img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1920&q=80">`;
-        }
-    };
+// 1. Toggle Settings Sidebar
+function toggleSettings() {
+    document.getElementById('settings-sidebar').classList.toggle('active');
+}
 
-    const renderBackground = (src, type) => {
-        if (type.includes('video')) {
-            bgContainer.innerHTML = `<video autoplay muted loop playsinline src="${src}"></video>`;
-        } else {
-            bgContainer.innerHTML = `<img src="${src}">`;
-        }
-    };
+// 2. Wallpaper System
+const bgUpload = document.getElementById('bg-upload');
+const bgContainer = document.getElementById('bg-container');
 
-    wallpaperInput.onchange = (e) => {
-        const file = e.target.files[0];
+bgUpload.addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
         const reader = new FileReader();
-        reader.onload = () => {
-            const result = reader.result;
-            const type = file.type;
-            renderBackground(result, type);
-            // Save to LocalStorage
-            document.getElementById('save-bg').onclick = () => {
-                localStorage.setItem('customBg', result);
-                localStorage.setItem('bgType', type);
-                alert("Wallpaper Saved!");
-            };
+        reader.onload = function(e) {
+            renderBackground(e.target.result, file.type);
         };
         reader.readAsDataURL(file);
-    };
+    }
+});
 
-    document.getElementById('reset-bg').onclick = () => {
-        localStorage.removeItem('customBg');
-        localStorage.removeItem('bgType');
-        location.reload();
-    };
+function renderBackground(src, type) {
+    bgContainer.innerHTML = '';
+    if (type.includes('video')) {
+        bgContainer.innerHTML = `<video src="${src}" autoplay loop muted playsinline></video>`;
+    } else {
+        bgContainer.innerHTML = `<img src="${src}">`;
+    }
+}
 
-    // 2. Auth System (Local Storage)
-    document.getElementById('go-to-register').onclick = () => {
-        loginForm.style.display = 'none';
-        registerForm.style.display = 'block';
-    };
+function saveWallpaper() {
+    const media = bgContainer.firstChild;
+    if (media) {
+        localStorage.setItem('savedBG', media.src);
+        localStorage.setItem('bgType', media.tagName.toLowerCase());
+        alert('Wallpaper Saved!');
+    }
+}
 
-    document.getElementById('go-to-login').onclick = () => {
-        registerForm.style.display = 'none';
-        loginForm.style.display = 'block';
-    };
+function resetWallpaper() {
+    localStorage.removeItem('savedBG');
+    location.reload();
+}
 
-    registerForm.onsubmit = (e) => {
-        e.preventDefault();
-        const u = document.getElementById('reg-user').value;
-        const p = document.getElementById('reg-pass').value;
-        localStorage.setItem(`user_${u}`, p);
-        alert("Account Created! Please Login.");
-        registerForm.style.display = 'none';
-        loginForm.style.display = 'block';
-    };
-
-    loginForm.onsubmit = (e) => {
-        e.preventDefault();
-        const u = document.getElementById('login-user').value;
-        const p = document.getElementById('login-pass').value;
-        const savedPass = localStorage.getItem(`user_${u}`);
-
-        if (savedPass && savedPass === p) {
-            alert(`Welcome back, ${u}!`);
-            authContainer.style.display = 'none';
-            mainInterface.style.display = 'flex';
+// Load Wallpaper on Start
+window.onload = () => {
+    const saved = localStorage.getItem('savedBG');
+    const type = localStorage.getItem('bgType');
+    if (saved) {
+        if (type === 'video') {
+            bgContainer.innerHTML = `<video src="${saved}" autoplay loop muted></video>`;
         } else {
-            alert("Invalid Username or Password!");
+            bgContainer.innerHTML = `<img src="${saved}">`;
         }
-    };
+    }
+};
 
-    // 3. AI Search Simulation
-    document.getElementById('send-btn').onclick = () => {
-        const query = document.getElementById('search-input').value;
-        if (!query) return;
+// 3. Auth System (Login/Register)
+function switchForm(mode) {
+    const title = document.getElementById('form-title');
+    const btn = document.getElementById('submitBtn');
+    const toggle = document.getElementById('toggle-text');
 
-        chatBox.innerHTML += `<div class="user-msg" style="text-align:right; margin:10px; color:#00f2ff;">You: ${query}</div>`;
-        
-        setTimeout(() => {
-            const googleLink = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-            const youtubeLink = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
-            
-            chatBox.innerHTML += `
-                <div class="bot-msg" style="background:rgba(255,255,255,0.1); padding:10px; border-radius:10px; margin:10px;">
-                    Searching for "${query}"... <br>
-                    🔗 <a href="${googleLink}" target="_blank" style="color:cyan">View on Google</a><br>
-                    🎬 <a href="${youtubeLink}" target="_blank" style="color:red">View on YouTube</a>
-                </div>`;
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }, 1000);
-        document.getElementById('search-input').value = "";
-    };
+    if (mode === 'register') {
+        isRegister = true;
+        title.innerText = "REGISTER";
+        btn.innerText = "REGISTER";
+        toggle.innerHTML = 'Have an account? <a href="javascript:void(0)" onclick="switchForm(\'login\')">Login</a>';
+    } else {
+        isRegister = false;
+        title.innerText = "LOGIN";
+        btn.innerText = "SIGN IN";
+        toggle.innerHTML = 'New here? <a href="javascript:void(0)" onclick="switchForm(\'register\')">Create Account</a>';
+    }
+}
 
-    // 4. UI Toggles
-    settingsToggle.onclick = () => settingsMenu.classList.add('active');
-    closeMenu.onclick = () => settingsMenu.classList.remove('active');
+document.getElementById('authForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
 
-    hideChatBtn.onclick = () => {
-        if (chatBox.style.visibility === 'hidden') {
-            chatBox.style.visibility = 'visible';
-            document.querySelector('.input-area').style.visibility = 'visible';
-            hideChatBtn.className = 'fas fa-eye';
+    if (isRegister) {
+        localStorage.setItem(`user_${user}`, pass);
+        alert("Registration Success! Please Login.");
+        switchForm('login');
+    } else {
+        const savedPass = localStorage.getItem(`user_${user}`);
+        if (savedPass === pass) {
+            alert("Welcome Back!");
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('main-app').style.display = 'flex';
         } else {
-            chatBox.style.visibility = 'hidden';
-            document.querySelector('.input-area').style.visibility = 'hidden';
-            hideChatBtn.className = 'fas fa-eye-slash';
+            alert("Wrong Username or Password!");
         }
-    };
-
-    loadWallpaper();
+    }
 });
